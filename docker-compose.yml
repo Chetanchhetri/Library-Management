@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    container_name: library-seat-api
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:///./data/library.db
+    volumes:
+      - ./data:/app/data        # library.db (+ WAL files) survive restarts and rebuilds
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
